@@ -1,0 +1,23 @@
+{
+  "name": "agent-governance-runtime",
+  "version": "1.0.0",
+  "description": "Provider-independent AI Agent Runtime Governance, Statistical Evaluation, Approval Workflows, Provenance Telemetry & Go-Live Gate Framework",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/governance.test.mjs && python3 -m unittest discover -s python -p 'test_*.py'"
+  },
+  "keywords": [
+    "agent-orchestration",
+    "llm-evaluation",
+    "runtime-governance",
+    "safety-engineering",
+    "approval-workflows",
+    "model-observability",
+    "data-provenance",
+    "applied-statistics",
+    "kill-switch",
+    "provider-abstraction"
+  ],
+  "author": "Abel Alejandro Tovar <myalexverse@gmail.com>",
+  "license": "MIT"
+}
