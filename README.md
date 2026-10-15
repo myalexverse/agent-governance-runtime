@@ -32,10 +32,12 @@ This repository implements a **provider-independent Agent Governance & Evaluatio
    - **Single-Action & Campaign-Level Approval Workflows:** Enforces human-in-the-loop sign-off for irreversible/external actions and statistical sample approval for batch campaigns.
    - **Automatic Quality-Based Suspension (Kill Switch):** Continuously tracks rolling outcomes and automatically suspends a capability when the 95% Wilson upper error bound exceeds policy thresholds.
 3. **🔌 Model Provider Abstraction & Observability Ledger:**
-   - Decouples agent workflows from any single vendor (`anthropic`, `openai`, `gemini`, `local`) via `ModelProviderRegistry`.
+   - Decouples agent workflows from any single vendor (`openai` including `astra-6` / GPT / o-series, `gemini` including `gemini-4-argo`, `anthropic` Claude, and `local`) via `ModelProviderRegistry`.
    - Records every model invocation with `callId`, `provider`, `model`, `instructionVersion`, SHA-256 `instructionHash`, `dataProvenance`, `latencyMs`, and deterministic output quality checks.
 4. **🚦 Pre-Release Go-Live Gate (`src/evaluation-gate.mjs`):**
    - Runs golden datasets against candidate model/instruction versions, evaluates task pass rate, deterministic safety rate, 95% error upper bound, and regression vs. baseline, returning a deterministic `GO_LIVE_APPROVED` or `HOLD_RELEASE` decision.
+5. **⚡ AI-Native Engineering Velocity + Strict Security & Best Practices:**
+   - Developed and verified using modern agentic engineering platforms (**Google Antigravity**, **OpenAI Codex**, and **Claude Code**) alongside frontier LLMs (**OpenAI Astra 6** and **Google Gemini 4 Argo**), combining high-velocity iteration with senior engineering discipline, clean architecture, deterministic verification, and strict security controls.
 
 ---
 

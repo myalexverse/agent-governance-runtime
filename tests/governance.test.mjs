@@ -52,7 +52,8 @@ test("Regression Detection: catches model or instruction degradation", () => {
 test("Governed Runtime: provider independence, provenance logging, approvals & deterministic checks", async () => {
   const registry = new ModelProviderRegistry();
   registry.register("anthropic", async ({ prompt }) => ({ output: `Draft reply for: ${prompt}` }));
-  registry.register("openai", async ({ prompt }) => ({ output: `OpenAI reply for: ${prompt}` }));
+  registry.register("openai", async ({ model, prompt }) => ({ output: `[${model}] OpenAI reply for: ${prompt}` }));
+  registry.register("gemini", async ({ model, prompt }) => ({ output: `[${model}] Gemini reply for: ${prompt}` }));
 
   const runtime = new GovernedAgentRuntime({
     providerRegistry: registry,
@@ -82,10 +83,10 @@ test("Governed Runtime: provider independence, provenance logging, approvals & d
     },
   });
 
-  // 1. Model call records provider, model, instructionVersion, provenance, and quality checks
+  // 1. Model call records provider, model, instructionVersion, provenance, and quality checks across providers
   const call = await runtime.invokeModel({
-    provider: "anthropic",
-    model: "claude-sonnet-4",
+    provider: "openai",
+    model: "astra-6",
     instructionVersion: "inst-v2.4.0",
     systemInstruction: "You are a governed customer outreach agent.",
     prompt: "Confirm Q4 renewal schedule",
@@ -95,10 +96,25 @@ test("Governed Runtime: provider independence, provenance logging, approvals & d
     ],
   });
 
-  assert.equal(runtime.auditLedger.length, 1);
-  assert.equal(runtime.auditLedger[0].model, "claude-sonnet-4");
+  const geminiCall = await runtime.invokeModel({
+    provider: "gemini",
+    model: "gemini-4-argo",
+    instructionVersion: "inst-v2.4.0",
+    systemInstruction: "You are a governed customer outreach agent.",
+    prompt: "Verify renewal compliance terms",
+    dataProvenance: { sourceId: "crm-account-882", classification: "client_approved" },
+    qualityValidators: [
+      { name: "non_empty", check: (out) => out.length > 10 },
+    ],
+  });
+
+  assert.equal(runtime.auditLedger.length, 2);
+  assert.equal(runtime.auditLedger[0].model, "astra-6");
+  assert.equal(runtime.auditLedger[1].model, "gemini-4-argo");
+  assert.equal(runtime.auditLedger[1].outputPreview.includes("gemini-4-argo"), true);
   assert.equal(runtime.auditLedger[0].instructionVersion, "inst-v2.4.0");
   assert.equal(runtime.auditLedger[0].qualityPassed, true);
+  assert.ok(geminiCall.callId);
 
   // 2. Data restriction blocks restricted classification
   const restricted = runtime.executeAction({
